@@ -126,13 +126,14 @@ public class ApiRequester { //update UI here
 
 
                         } catch (Exception e) {
-
+                            e.printStackTrace();
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 //                mTextView.setText("That didn't work!");
+                error.printStackTrace();
             }
 
         });

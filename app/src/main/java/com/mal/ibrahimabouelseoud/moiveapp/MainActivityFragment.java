@@ -1,9 +1,13 @@
 package com.mal.ibrahimabouelseoud.moiveapp;
 
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -24,6 +28,19 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
     ArrayList<Movie> favoriteMovies;
     public MainActivityFragment() {
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,25 +76,25 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
         requester.getPopular();
         ArrayList<Movie> result = requester.getMoviesArray();
         System.out.println(result.size());
-        final Switch switcher = (Switch) root.findViewById(R.id.switch1);
-        switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // do something, the isChecked will be
-                if(isChecked){
-                    switcher.setText("Top Rated");
-                    requester.getTopRated();
-
-                }
-                else {
-                    switcher.setText("Most Popular");
-                    requester.getPopular();
-
-
-
-                }
-                // true if the switch is in the On position
-            }
-        });
+//        final Switch switcher = (Switch) root.findViewById(R.id.switch1);
+//        switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                // do something, the isChecked will be
+//                if(isChecked){
+//                    switcher.setText("Top Rated");
+//                    requester.getTopRated();
+//
+//                }
+//                else {
+//                    switcher.setText("Most Popular");
+//                    requester.getPopular();
+//
+//
+//
+//                }
+//                // true if the switch is in the On position
+//            }
+//        });
 
         return root;
 
@@ -90,4 +107,36 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
 
 
     }
+    public void displayFavorites(){
+        TinyDB tinydb = new TinyDB(getContext());
+        ArrayList<Movie> favMovies;
+        try{
+            favMovies=tinydb.getListMovie("favoriteMovies",Movie.class);
+//            Toast.makeText(getContext(), favMovies.size()+"test",
+//                    Toast.LENGTH_LONG).show();
+            if(favMovies.size()>0)
+            updateView(favMovies);
+            else Toast.makeText(getContext(), "No favorites saved in app yet!", Toast.LENGTH_LONG).show();
+        }catch(Exception e){ //no favorites added yet
+            Toast.makeText(getContext(), "No favorites saved in app yet!",
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_favorites) {
+            displayFavorites();
+            return true;
+        }
+        switch (id){
+            case R.id.action_favorites: displayFavorites();break;
+            case R.id.action_top:requester.getTopRated();break;
+            case R.id.action_popular:requester.getPopular();break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }

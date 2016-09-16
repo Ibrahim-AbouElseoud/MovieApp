@@ -95,6 +95,9 @@ public class MovieDetailsFragment extends Fragment {
                     favMovies.add(favMovie);
                     tinydb.putListMovie("favoriteMovies",favMovies);
                 }
+                Movie favMovie=new Movie(titleText,releaseDateText, voteVal,plotText,posterUri);
+                favMovies.add(favMovie);
+                tinydb.putListMovie("favoriteMovies",favMovies);
                 Toast.makeText(getContext(), "added " + titleText+ " to favorites!",
                         Toast.LENGTH_SHORT).show();
 

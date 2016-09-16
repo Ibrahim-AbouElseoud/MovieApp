@@ -67,6 +67,28 @@
         android:layout_below="@+id/imageViewPicture"
         android:layout_alignParentStart="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add to Favorites"
+        android:id="@+id/favoriteButton"
+        android:layout_below="@+id/textVote"
+        android:layout_toEndOf="@+id/imageViewPicture"
+        android:layout_above="@id/textOverView"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Trailers:"
+        android:id="@+id/trailerLabel"
+        android:layout_below="@+id/textOverView"
+        android:layout_alignParentStart="true" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/trailerLabel"
+        android:layout_alignParentStart="true"></LinearLayout>
 
 
     <!--<TextView-->

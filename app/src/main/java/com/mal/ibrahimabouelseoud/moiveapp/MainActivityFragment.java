@@ -21,6 +21,7 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
     ApiRequester requester;
     GridView gridview;
     ArrayList<Movie> movies;
+    ArrayList<Movie> favoriteMovies;
     public MainActivityFragment() {
     }
 
@@ -30,8 +31,6 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
         View root = inflater.inflate(R.layout.fragment_main, container, false); //draws into root or creates it
 
         gridview = (GridView) root.findViewById(R.id.gridview);
-//        gridview.setAdapter(new ImageAdapter(getContext(),MainActivityFragment.this));
-
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
@@ -50,11 +49,11 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
                 intent.putExtra("plot",plot);
                 intent.putExtra("posterUri",posterUri);
 
-//                int a=Integer.parseInt(txtname.getText().toString());
-//                intent.putExtra("number",a+"");
+
                 startActivity(intent);
             }
         });
+
 
          requester = new ApiRequester(getContext(),MainActivityFragment.this);
         requester.getPopular();
@@ -66,12 +65,13 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
                 // do something, the isChecked will be
                 if(isChecked){
                     switcher.setText("Top Rated");
-                    requester.getPopular();
+                    requester.getTopRated();
 
                 }
                 else {
                     switcher.setText("Most Popular");
-                    requester.getTopRated();
+                    requester.getPopular();
+
 
 
                 }

@@ -1,5 +1,7 @@
 package com.mal.ibrahimabouelseoud.moiveapp;
 
+import io.realm.RealmObject;
+
 /**
  * Created by Ibrahim Abou Elseoud on 13-Aug-16.
  */

@@ -81,9 +81,11 @@ public class ApiRequester { //update UI here
                                 double voteAvg = Double.parseDouble(movie.getString("vote_average").toString());
                                 String plot = movie.getString("overview").toString();
                                 String posterUri = movie.getString("poster_path");
+                                String id = movie.getString("id");
+
 //                                Log.i("ay 7agaaaa", "onResponse: ");
 
-                                moviesArray.add(new Movie(title, releaseDate, voteAvg, plot, posterUri));
+                                moviesArray.add(new Movie(title, releaseDate, voteAvg, plot, posterUri,id));
                             }
 //                            ImageAdapter a = new ImageAdapter(context, moviesArray);
                             myFragment.updateMasterView(moviesArray);
@@ -121,8 +123,9 @@ public class ApiRequester { //update UI here
                                 double voteAvg = Double.parseDouble(movie.getString("vote_average").toString());
                                 String plot = movie.getString("overview").toString();
                                 String posterUri = movie.getString("poster_path");
+                                String id = movie.getString("id");
 
-                                moviesArray.add(new Movie(title, releaseDate, voteAvg, plot, posterUri));
+                                moviesArray.add(new Movie(title, releaseDate, voteAvg, plot, posterUri,id));
                             }
 //                            ImageAdapter a = new ImageAdapter(context, moviesArray);
                             myFragment.updateMasterView(moviesArray);
@@ -143,7 +146,7 @@ public class ApiRequester { //update UI here
 // Add the request to the RequestQueue.
         queue.add(getRequest);
     }
-    public void getReviews(int movieId) {
+    public void getReviews(String movieId) {
         reviews = new ArrayList<Review>();
         // Request a string response from the provided URL.
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, "http://api.themoviedb.org/3/movie/"+movieId+"/reviews?api_key=202668e093a80f7cff8a7da31e8aafa8", null,
@@ -161,7 +164,7 @@ public class ApiRequester { //update UI here
 
                                 reviews.add(new Review(author, content));
                             }
-                            myFragment.updateMasterView(moviesArray);
+                            myFragment.updateDetailReview(reviews);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -178,8 +181,8 @@ public class ApiRequester { //update UI here
         queue.add(getRequest);
     }
 
-    public void getTrailers(int movieId) {
-        moviesArray = new ArrayList<Movie>();
+    public void getTrailers(String movieId) {
+        trailers = new ArrayList<Trailer>();
         // Request a string response from the provided URL.
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, "http://api.themoviedb.org/3/movie/"+movieId+"/videos?api_key=202668e093a80f7cff8a7da31e8aafa8", null,
                 new Response.Listener<JSONObject>() {
@@ -198,7 +201,7 @@ public class ApiRequester { //update UI here
                                 trailers.add(t);
                             }
 
-                            myFragment.updateMasterView(moviesArray);
+                            myFragment.updateDetailTrailer(trailers);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

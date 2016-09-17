@@ -71,6 +71,9 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
         overView.setText(plotText);
         final double voteVal=i.getDoubleExtra("vote",0.0);
         vote.setText("Vote Average "+voteVal);
+
+        final String movieId= i.getStringExtra("id");
+        requester.getTrailers(movieId);
 //        ratingBar.setRating((float)voteVal);
 //        ratingBar.setIsIndicator(true);
 
@@ -98,32 +101,9 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
             public void onClick(View v) {
                 // TODO Auto-generated method stub
 
-                // Idea 1 save each movie individually in tinyDB
-//                int maxIndex;
-//                try {
-//                    maxIndex= tinydb.getInt("maxIndex");
-//                }
-//                catch(Exception e){ //if first time and maxIndex not defined then max is -1
-//                    tinydb.putInt("maxIndex",-1);
-//                    maxIndex=-1;
-//                }
-//                Movie favMovie=new Movie(titleText,releaseDateText, voteVal,plotText,posterUri);
-//                maxIndex++;
-//                tinydb.putObject("fav"+maxIndex,favMovie); //key in form of fav0 for first movie
-
-                //Idea 2 save a movie array and edit it each time using tinyDB
-
                 ArrayList<Movie> favMovies = MainActivityFragment.favMovies;
 
-//                try{
-//                    favMovies=tinydb.getListMovie("favoriteMovies",Movie.class);
-//                }catch(Exception e){ //if first time and favMovies not defined then do new one and save movie
-//                    favMovies=new ArrayList<Movie>();
-//                     Movie favMovie=new Movie(titleText,releaseDateText, voteVal,plotText,posterUri);
-//                    favMovies.add(favMovie);
-//                    tinydb.putListMovie("favoriteMovies",favMovies);
-//                }
-                Movie favMovie=new Movie(titleText,releaseDateText, voteVal,plotText,posterUri);
+                Movie favMovie=new Movie(titleText,releaseDateText, voteVal,plotText,posterUri,movieId);
                 favMovies.add(favMovie);
                 tinydb.putListMovie("favoriteMovies",favMovies);
                 Toast.makeText(getContext(), "added " + titleText+ " to favorites!",
@@ -151,11 +131,6 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
     }
     public int isInFavoritesIndex(String title){
         ArrayList<Movie> favMovies = MainActivityFragment.favMovies;
-//        for(Movie movie:favMovies){
-//            if(movie.title.equals(title))
-//                return true;
-//        }
-//        return false;
         for(int i=0;i<favMovies.size();i++) {
             if (favMovies.get(i).title.equals(title)) {
                 return i;
@@ -163,13 +138,5 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
         }
         return -1; //meaning not found
     }
-//    public void deleteFromFav(String title){
-//        ArrayList<Movie> favMovies = MainActivityFragment.favMovies;
-//        for(int i=0;i<favMovies.size();i++){
-//            if(favMovies.get(i).title.equals(title)) {
-//                favMovies.remove(i);
-//                return;
-//            }
-//        }
-//    }
+
 }

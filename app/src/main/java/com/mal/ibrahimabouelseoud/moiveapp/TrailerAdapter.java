@@ -41,9 +41,12 @@ public class TrailerAdapter extends ArrayAdapter<Trailer>{
         button.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent videoStart = new Intent(Intent.ACTION_VIEW);
-                videoStart.setDataAndType(Uri.parse(trailer.youtubeURL), "video/*");
-                getContext().startActivity(videoStart);
+//                Intent videoStart = new Intent(Intent.ACTION_VIEW);
+//                videoStart.setDataAndType(Uri.parse(trailer.youtubeURL), "video/*");
+//                getContext().startActivity(videoStart);
+
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(trailer.youtubeURL));
+                context.startActivity(i);
             }
         }
         );

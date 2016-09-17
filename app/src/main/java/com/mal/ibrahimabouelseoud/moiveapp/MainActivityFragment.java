@@ -59,11 +59,13 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
                 double voteAvg = movie.voteAvg;
                 String plot = movie.plot;
                 String posterUri=movie.posterUri;
+                String idTxt=movie.id;
                 intent.putExtra("title",title);
                 intent.putExtra("releaseDate",releaseDate);
                 intent.putExtra("vote",voteAvg);
                 intent.putExtra("plot",plot);
                 intent.putExtra("posterUri",posterUri);
+                intent.putExtra("id",idTxt);
 
 
                 startActivity(intent);

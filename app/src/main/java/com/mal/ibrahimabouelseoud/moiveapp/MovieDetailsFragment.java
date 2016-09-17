@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -16,11 +18,12 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MovieDetailsFragment extends Fragment {
+public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
     TextView title;
     TextView releaseDate;
     TextView vote;
@@ -29,6 +32,9 @@ public class MovieDetailsFragment extends Fragment {
 //    RatingBar ratingBar;
     Button favBtn;
     TinyDB tinydb;
+    ListView trailerListView;
+    ListView reviewListView;
+    ApiRequester requester;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,6 +48,11 @@ public class MovieDetailsFragment extends Fragment {
 //        ratingBar= (RatingBar) rootView.findViewById(R.id.ratingBar);
         favBtn=(Button) rootView.findViewById(R.id.favoriteButton);
         tinydb = new TinyDB(getContext());
+
+        trailerListView =(ListView) rootView.findViewById(R.id.trailerListView);
+        reviewListView =(ListView) rootView.findViewById(R.id.reviewListView);
+
+        requester=new ApiRequester(getContext(),MovieDetailsFragment.this);
 
         return rootView;
 
@@ -65,6 +76,23 @@ public class MovieDetailsFragment extends Fragment {
 
         final String posterUri= i.getStringExtra("posterUri");
         Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185"+posterUri).into(imageBox);
+
+        final int index=isInFavoritesIndex(titleText);
+        if(index!=-1){
+            favBtn.setText("Remove from Favorites");
+            favBtn.setOnClickListener( new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ArrayList<Movie> favMovies = MainActivityFragment.favMovies;
+                    favMovies.remove(index);
+                    tinydb.putListMovie("favoriteMovies",favMovies);
+                    Toast.makeText(getContext(), "removed " + titleText+ " from favorites!",
+                            Toast.LENGTH_SHORT).show();
+                    favBtn.setVisibility(View.INVISIBLE);
+                }
+            });
+        }
+        else
         favBtn.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,25 +113,63 @@ public class MovieDetailsFragment extends Fragment {
 
                 //Idea 2 save a movie array and edit it each time using tinyDB
 
-                ArrayList<Movie> favMovies;
+                ArrayList<Movie> favMovies = MainActivityFragment.favMovies;
 
-                try{
-                    favMovies=tinydb.getListMovie("favoriteMovies",Movie.class);
-                }catch(Exception e){ //if first time and favMovies not defined then do new one and save movie
-                    favMovies=new ArrayList<Movie>();
-                     Movie favMovie=new Movie(titleText,releaseDateText, voteVal,plotText,posterUri);
-                    favMovies.add(favMovie);
-                    tinydb.putListMovie("favoriteMovies",favMovies);
-                }
+//                try{
+//                    favMovies=tinydb.getListMovie("favoriteMovies",Movie.class);
+//                }catch(Exception e){ //if first time and favMovies not defined then do new one and save movie
+//                    favMovies=new ArrayList<Movie>();
+//                     Movie favMovie=new Movie(titleText,releaseDateText, voteVal,plotText,posterUri);
+//                    favMovies.add(favMovie);
+//                    tinydb.putListMovie("favoriteMovies",favMovies);
+//                }
                 Movie favMovie=new Movie(titleText,releaseDateText, voteVal,plotText,posterUri);
                 favMovies.add(favMovie);
                 tinydb.putListMovie("favoriteMovies",favMovies);
                 Toast.makeText(getContext(), "added " + titleText+ " to favorites!",
                         Toast.LENGTH_SHORT).show();
-
-
+                favBtn.setVisibility(View.INVISIBLE);
             }
         });
 
     }
+
+
+    @Override
+    public void updateMasterView(ArrayList<Movie> moviesArray) {
+
+    }
+
+    @Override
+    public void updateDetailTrailer(ArrayList<Trailer> trailerArray) {
+        trailerListView.setAdapter(new TrailerAdapter(getContext(),trailerArray));
+    }
+
+    @Override
+    public void updateDetailReview(ArrayList<Review> reviewArray) {
+
+    }
+    public int isInFavoritesIndex(String title){
+        ArrayList<Movie> favMovies = MainActivityFragment.favMovies;
+//        for(Movie movie:favMovies){
+//            if(movie.title.equals(title))
+//                return true;
+//        }
+//        return false;
+        for(int i=0;i<favMovies.size();i++) {
+            if (favMovies.get(i).title.equals(title)) {
+                return i;
+            }
+        }
+        return -1; //meaning not found
+    }
+//    public void deleteFromFav(String title){
+//        ArrayList<Movie> favMovies = MainActivityFragment.favMovies;
+//        for(int i=0;i<favMovies.size();i++){
+//            if(favMovies.get(i).title.equals(title)) {
+//                favMovies.remove(i);
+//                return;
+//            }
+//        }
+//    }
 }

@@ -25,9 +25,8 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
     ApiRequester requester;
     GridView gridview;
     ArrayList<Movie> movies;
-    ArrayList<Movie> favoriteMovies;
-    public MainActivityFragment() {
-    }
+    static ArrayList<Movie> favMovies;//use to see if in favorites or not
+    TinyDB tinydb;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,11 +70,16 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
             }
         });
 
-
-         requester = new ApiRequester(getContext(),MainActivityFragment.this);
+        tinydb= new TinyDB(getContext());
+        requester = new ApiRequester(getContext(),MainActivityFragment.this);
         requester.getPopular();
-        ArrayList<Movie> result = requester.getMoviesArray();
-        System.out.println(result.size());
+        try {
+            favMovies = tinydb.getListMovie("favoriteMovies", Movie.class);
+        }
+        catch(Exception e){ //then does not exist yet
+            favMovies=new ArrayList<Movie>();
+            tinydb.putListMovie("favoriteMovies",favMovies);
+        }
 //        final Switch switcher = (Switch) root.findViewById(R.id.switch1);
 //        switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 //            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -101,26 +105,29 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
     }
 
 
-    public void updateView(ArrayList<Movie> moviesArray) {
+    public void updateMasterView(ArrayList<Movie> moviesArray) {
         movies=moviesArray;
         gridview.setAdapter(new ImageAdapter(getContext(),moviesArray));
 
 
     }
+
+    @Override
+    public void updateDetailTrailer(ArrayList<Trailer> trailerArray) {
+
+    }
+
+    @Override
+    public void updateDetailReview(ArrayList<Review> reviewArray) {
+
+    }
+
     public void displayFavorites(){
-        TinyDB tinydb = new TinyDB(getContext());
-        ArrayList<Movie> favMovies;
-        try{
-            favMovies=tinydb.getListMovie("favoriteMovies",Movie.class);
-//            Toast.makeText(getContext(), favMovies.size()+"test",
-//                    Toast.LENGTH_LONG).show();
-            if(favMovies.size()>0)
-            updateView(favMovies);
-            else Toast.makeText(getContext(), "No favorites saved in app yet!", Toast.LENGTH_LONG).show();
-        }catch(Exception e){ //no favorites added yet
-            Toast.makeText(getContext(), "No favorites saved in app yet!",
-                    Toast.LENGTH_LONG).show();
+        if(favMovies.size()>0) {
+//            favMovies=tinydb.getListMovie("favoriteMovies",Movie.class); //update our current favorite array
+            updateMasterView(favMovies);
         }
+        else Toast.makeText(getContext(), "No favorites saved in app yet!", Toast.LENGTH_LONG).show();
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

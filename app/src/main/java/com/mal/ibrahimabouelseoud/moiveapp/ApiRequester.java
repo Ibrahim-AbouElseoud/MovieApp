@@ -31,6 +31,9 @@ public class ApiRequester { //update UI here
     private ArrayList<Movie> moviesArray;
     private Context context;
     private UpdatableFragment myFragment;
+    private ArrayList<Trailer> trailers;
+    private ArrayList<Review> reviews;
+    private MovieDetailsFragment movieDetailsFragment;
 
 
     public ArrayList<Movie> getMoviesArray() {
@@ -53,7 +56,7 @@ public class ApiRequester { //update UI here
         return imgUrl;
     }
 
-    public ApiRequester(Context context, MainActivityFragment currentFragment) {
+    public ApiRequester(Context context, UpdatableFragment currentFragment) {
         this.context = context;
         queue = Volley.newRequestQueue(context);
 //        moviesArray= new ArrayList<Movie>();
@@ -83,7 +86,7 @@ public class ApiRequester { //update UI here
                                 moviesArray.add(new Movie(title, releaseDate, voteAvg, plot, posterUri));
                             }
 //                            ImageAdapter a = new ImageAdapter(context, moviesArray);
-                            myFragment.updateView(moviesArray);
+                            myFragment.updateMasterView(moviesArray);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -122,7 +125,7 @@ public class ApiRequester { //update UI here
                                 moviesArray.add(new Movie(title, releaseDate, voteAvg, plot, posterUri));
                             }
 //                            ImageAdapter a = new ImageAdapter(context, moviesArray);
-                            myFragment.updateView(moviesArray);
+                            myFragment.updateMasterView(moviesArray);
 
 
                         } catch (Exception e) {
@@ -140,5 +143,75 @@ public class ApiRequester { //update UI here
 // Add the request to the RequestQueue.
         queue.add(getRequest);
     }
+    public void getReviews(int movieId) {
+        reviews = new ArrayList<Review>();
+        // Request a string response from the provided URL.
+        JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, "http://api.themoviedb.org/3/movie/"+movieId+"/reviews?api_key=202668e093a80f7cff8a7da31e8aafa8", null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Display the first 500 characters of the response string.
+                        try {
+                            JSONArray results = response.getJSONArray("results");
+                            for (int i = 0; i < results.length(); i++) {
+                                JSONObject review = results.getJSONObject(i);
 
+                                String author = review.getString("author").toString();
+                                String content = review.getString("content").toString();
+
+                                reviews.add(new Review(author, content));
+                            }
+                            myFragment.updateMasterView(moviesArray);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+//                mTextView.setText("That didn't work!");
+                Log.i("errorrrr", "onErrorResponse: ");
+                error.printStackTrace();
+            }
+        });
+// Add the request to the RequestQueue.
+        queue.add(getRequest);
+    }
+
+    public void getTrailers(int movieId) {
+        moviesArray = new ArrayList<Movie>();
+        // Request a string response from the provided URL.
+        JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, "http://api.themoviedb.org/3/movie/"+movieId+"/videos?api_key=202668e093a80f7cff8a7da31e8aafa8", null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Display the first 500 characters of the response string.
+                        try {
+                            JSONArray results = response.getJSONArray("results");
+                            for (int i = 0; i < results.length(); i++) {
+                                JSONObject trailer = results.getJSONObject(i);
+
+                                String name = trailer.getString("name").toString();
+                                String key = trailer.getString("key").toString();
+                                Trailer t=new Trailer(name,key);
+                                t.setYoutubeURL();
+                                trailers.add(t);
+                            }
+
+                            myFragment.updateMasterView(moviesArray);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+//                mTextView.setText("That didn't work!");
+                Log.i("errorrrr", "onErrorResponse: ");
+                error.printStackTrace();
+            }
+        });
+// Add the request to the RequestQueue.
+        queue.add(getRequest);
+    }
 }

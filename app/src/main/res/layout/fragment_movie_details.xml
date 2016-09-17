@@ -75,13 +75,19 @@
         android:layout_below="@+id/textVote"
         android:layout_toEndOf="@+id/imageViewPicture"
         android:layout_above="@id/textOverView"/>
-
-    <LinearLayout
-        android:orientation="vertical"
+    <View
+        android:id="@+id/SplitLine_hor1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/textOverView"></LinearLayout>
+        android:layout_height= "2dp"
+        android:background="@color/colorPrimaryDark"
+        android:layout_below="@+id/textOverView"/>
+
+    <!--<LinearLayout-->
+        <!--android:orientation="vertical"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_below="@+id/textOverView"></LinearLayout>-->
 
     <LinearLayout
         android:weightSum="1"

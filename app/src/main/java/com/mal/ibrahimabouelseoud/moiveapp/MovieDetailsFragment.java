@@ -74,6 +74,7 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
 
         final String movieId= i.getStringExtra("id");
         requester.getTrailers(movieId);
+        requester.getReviews(movieId);
 //        ratingBar.setRating((float)voteVal);
 //        ratingBar.setIsIndicator(true);
 
@@ -127,7 +128,7 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
 
     @Override
     public void updateDetailReview(ArrayList<Review> reviewArray) {
-
+        reviewListView.setAdapter(new ReviewAdapter(getContext(),reviewArray));
     }
     public int isInFavoritesIndex(String title){
         ArrayList<Movie> favMovies = MainActivityFragment.favMovies;

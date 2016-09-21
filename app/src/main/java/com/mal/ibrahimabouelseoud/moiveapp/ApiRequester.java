@@ -1,7 +1,6 @@
 package com.mal.ibrahimabouelseoud.moiveapp;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -18,6 +17,8 @@ import java.util.ArrayList;
 
 /**
  * Created by Ibrahim Abou Elseoud on 13-Aug-16.
+ *
+ * API Requester is responsible for doing all API requests (except images) and when it finishes populating it's array it calls on a method from the interface of the fragment
  */
 public class ApiRequester { //update UI here
 
@@ -25,7 +26,6 @@ public class ApiRequester { //update UI here
     private String api_key = "202668e093a80f7cff8a7da31e8aafa8";
     private String popularUrl = "http://api.themoviedb.org/3/movie/popular?api_key=202668e093a80f7cff8a7da31e8aafa8";
     private String topUrl = "http://api.themoviedb.org/3/movie/top_rated?api_key=202668e093a80f7cff8a7da31e8aafa8";
-    //    private String url ="https://api.themoviedb.org/3/movie/550?api_key=202668e093a80f7cff8a7da31e8aafa8";
     private String imgUrl = "http://image.tmdb.org/t/p/w185"; //concatinate movie id after
     private RequestQueue queue;
     private JSONArray response;
@@ -60,10 +60,9 @@ public class ApiRequester { //update UI here
     public ApiRequester(Context context, UpdatableFragment currentFragment) {
         this.context = context;
         queue = Volley.newRequestQueue(context);
-//        moviesArray= new ArrayList<Movie>();
         myFragment = currentFragment;
     }
-
+// gets the popular movies then forwards the data to the fragment's interface (specifically the MainActivityFragment) when done.
     public void getPopular() {
         moviesArray = new ArrayList<Movie>();
         // Request a string response from the provided URL.
@@ -71,7 +70,6 @@ public class ApiRequester { //update UI here
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        // Display the first 500 characters of the response string.
                         try {
                             JSONArray results = response.getJSONArray("results");
                             for (int i = 0; i < results.length(); i++) {
@@ -84,11 +82,8 @@ public class ApiRequester { //update UI here
                                 String posterUri = movie.getString("poster_path");
                                 String id = movie.getString("id");
 
-//                                Log.i("ay 7agaaaa", "onResponse: ");
-
                                 moviesArray.add(new Movie(title, releaseDate, voteAvg, plot, posterUri,id));
                             }
-//                            ImageAdapter a = new ImageAdapter(context, moviesArray);
                             myFragment.updateMasterView(moviesArray);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -97,8 +92,7 @@ public class ApiRequester { //update UI here
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                mTextView.setText("That didn't work!");
-                Log.i("errorrrr", "onErrorResponse: ");
+
                 error.printStackTrace();
                 Toast.makeText(context, "Network error , please check your network !",
                         Toast.LENGTH_LONG).show();
@@ -108,6 +102,7 @@ public class ApiRequester { //update UI here
         queue.add(getRequest);
     }
 
+// gets the Top rated movies then forwards the data to the fragment's interface (specifically the MainActivityFragment) when done.
     public void getTopRated() {
         moviesArray = new ArrayList<Movie>();
         // Request a string response from the provided URL.
@@ -115,7 +110,6 @@ public class ApiRequester { //update UI here
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        // Display the first 500 characters of the response string.
                         try {
                             JSONArray results = response.getJSONArray("results");
                             for (int i = 0; i < results.length(); i++) {
@@ -130,7 +124,6 @@ public class ApiRequester { //update UI here
 
                                 moviesArray.add(new Movie(title, releaseDate, voteAvg, plot, posterUri,id));
                             }
-//                            ImageAdapter a = new ImageAdapter(context, moviesArray);
                             myFragment.updateMasterView(moviesArray);
 
 
@@ -141,7 +134,6 @@ public class ApiRequester { //update UI here
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                mTextView.setText("That didn't work!");
                 error.printStackTrace();
                 Toast.makeText(context, "Network error , please check your network !",
                         Toast.LENGTH_LONG).show();
@@ -151,6 +143,8 @@ public class ApiRequester { //update UI here
 // Add the request to the RequestQueue.
         queue.add(getRequest);
     }
+
+    // gets the Review's author and content then forwards the data to the fragment's interface(specifically the MovieDetailsFragment) when done.
     public void getReviews(String movieId) {
         reviews = new ArrayList<Review>();
         // Request a string response from the provided URL.
@@ -158,7 +152,6 @@ public class ApiRequester { //update UI here
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        // Display the first 500 characters of the response string.
                         try {
                             JSONArray results = response.getJSONArray("results");
                             for (int i = 0; i < results.length(); i++) {
@@ -177,8 +170,6 @@ public class ApiRequester { //update UI here
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                mTextView.setText("That didn't work!");
-                Log.i("errorrrr", "onErrorResponse: ");
                 error.printStackTrace();
                 Toast.makeText(context, "Network error while getting reviews , please check your network !",
                         Toast.LENGTH_LONG).show();
@@ -188,6 +179,7 @@ public class ApiRequester { //update UI here
         queue.add(getRequest);
     }
 
+    // gets the trailer then forwards the data to the fragment's interface (specifically the MovieDetailsFragment) when done.
     public void getTrailers(String movieId) {
         trailers = new ArrayList<Trailer>();
         // Request a string response from the provided URL.
@@ -195,7 +187,6 @@ public class ApiRequester { //update UI here
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        // Display the first 500 characters of the response string.
                         try {
                             JSONArray results = response.getJSONArray("results");
                             for (int i = 0; i < results.length(); i++) {
@@ -216,8 +207,6 @@ public class ApiRequester { //update UI here
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                mTextView.setText("That didn't work!");
-                Log.i("errorrrr", "onErrorResponse: ");
                 error.printStackTrace();
                 Toast.makeText(context, "Network error while getting trailer , please check your network !",
                         Toast.LENGTH_LONG).show();

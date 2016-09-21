@@ -8,20 +8,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Fragment containing the Details of the Movie
  */
 public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
     TextView title;
@@ -30,12 +27,12 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
     TextView overView;
     ImageView imageBox;
     View lineBreak;
-//    RatingBar ratingBar;
     Button favBtn;
     TinyDB tinydb;
     ListView trailerListView;
     ListView reviewListView;
     ApiRequester requester;
+
     /// data
     String titleText;
     String releaseDateText;
@@ -56,7 +53,6 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
          vote= (TextView) rootView.findViewById(R.id.textVote);
          overView = (TextView) rootView.findViewById(R.id.textOverView);
          imageBox =  (ImageView) rootView.findViewById(R.id.imageViewPicture);
-//        ratingBar= (RatingBar) rootView.findViewById(R.id.ratingBar);
         favBtn=(Button) rootView.findViewById(R.id.favoriteButton);
         lineBreak=(View) rootView.findViewById(R.id.SplitLine_hor1);
         tinydb = new TinyDB(getActivity());
@@ -74,7 +70,7 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        // if there is saved data , then load current user's movie data and display (updateDetailView)
         if(savedInstanceState !=null){
             updateDetailsView(savedInstanceState.getString("title"),
                     savedInstanceState.getString("releaseDate"),
@@ -83,6 +79,7 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
                     savedInstanceState.getString("id"),
                     savedInstanceState.getString("posterUri"));
         }
+        //otherwise it's first time to open and no data yet for detail so if tablet show nothing but message to click a movie , if phone then just load data from the intent
         else {
             if (getResources().getBoolean(R.bool.isTablet)) {
 
@@ -101,7 +98,7 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
 
 
     }
-
+//Save current user movie data (in case of screen orientation change for example)
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -118,15 +115,18 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
 
     }
 
+// load trailer's (called from API Requester since it has the data)
     @Override
     public void updateDetailTrailer(ArrayList<Trailer> trailerArray) {
         trailerListView.setAdapter(new TrailerAdapter(getActivity(),trailerArray));
     }
 
+//load review's (called from API Requester since it has the data)
     @Override
     public void updateDetailReview(ArrayList<Review> reviewArray) {
         reviewListView.setAdapter(new ReviewAdapter(getActivity(),reviewArray));
     }
+    //Check if the movie is in favorites if it is then it will give it's index for easy direct removal if not found then it will return -1
     public int isInFavoritesIndex(String title){
         ArrayList<Movie> favMovies = MainActivityFragment.favMovies;
         for(int i=0;i<favMovies.size();i++) {
@@ -136,6 +136,7 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
         }
         return -1; //meaning not found
     }
+    //update the details view for mobile (used for mobile only since it relies on intents)
     public void updateDetailsView(){
         Intent i = getActivity().getIntent();
         titleText= i.getStringExtra("title");
@@ -150,8 +151,7 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
         movieId= i.getStringExtra("id");
         requester.getTrailers(movieId);
         requester.getReviews(movieId);
-//        ratingBar.setRating((float)voteVal);
-//        ratingBar.setIsIndicator(true);
+
 
         posterUri= i.getStringExtra("posterUri");
         Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185"+posterUri).into(imageBox);
@@ -159,6 +159,8 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
         updateFavButton();
 
     }
+
+    //update the details view used mainly for tablet and to display the active movie for mobile (used generally when you have the data)
     public void updateDetailsView(String titleText,String releaseDateText,String plotText,double voteVal,String movieId,String posterUri){
         this.titleText=titleText;
         title.setText(titleText);
@@ -176,14 +178,14 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
         this.movieId= movieId;
         requester.getTrailers(movieId);
         requester.getReviews(movieId);
-//        ratingBar.setRating((float)voteVal);
-//        ratingBar.setIsIndicator(true);
+
 
         this.posterUri= posterUri;
         Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185"+posterUri).into(imageBox);
         favBtn.setVisibility(View.VISIBLE);
         updateFavButton();
     }
+    //updates the Favorite button to display "Remove from favorites" in case of movie in favorites or "Add to Favorites" incase not in favorites and supplies with the correct click listener)
     public void updateFavButton(){
         favIndex=isInFavoritesIndex(titleText);
         if(favIndex!=-1){

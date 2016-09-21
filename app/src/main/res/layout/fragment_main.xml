@@ -23,12 +23,4 @@
         android:gravity="center"
          />
 
-    <!--        android:layout_below="@+id/switch1"-->
-
-    <!--<Switch-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/switch1"-->
-        <!--android:text="Most Popular" />-->
-
 </RelativeLayout>

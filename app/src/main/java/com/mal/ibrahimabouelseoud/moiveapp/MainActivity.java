@@ -8,8 +8,7 @@ import android.view.Menu;
 public class MainActivity extends AppCompatActivity implements movieClickListener {
     MainActivityFragment fragMaster;
     MovieDetailsFragment fragDetail;
-// using the key https://api.themoviedb.org/3/movie/550?api_key=202668e093a80f7cff8a7da31e8aafa8
-    public final String  api_key="202668e093a80f7cff8a7da31e8aafa8";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -17,6 +16,7 @@ public class MainActivity extends AppCompatActivity implements movieClickListene
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if(savedInstanceState==null) {
+            //if it's tablet replace both frames
             if (getResources().getBoolean(R.bool.isTablet)) {
                 fragMaster = new MainActivityFragment();
                 fragDetail = new MovieDetailsFragment();
@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements movieClickListene
                 getFragmentManager().beginTransaction().add(R.id.secondPanel, fragDetail).commit();
             }
             else{
+                //otherwise it's mobile and just replace the first frame
                 fragMaster = new MainActivityFragment();
                 getFragmentManager().beginTransaction().add(R.id.firstPanel, fragMaster).commit();
             }
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements movieClickListene
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
-
+//interface for the main activity to send data do the details view from the MainActivityFragment
     @Override
     public void updateMovieDetailsView(String titleText,String releaseDateText,String plotText,double voteVal,String movieId,String posterUri) {
         fragDetail=(MovieDetailsFragment) getFragmentManager().findFragmentById(R.id.secondPanel);

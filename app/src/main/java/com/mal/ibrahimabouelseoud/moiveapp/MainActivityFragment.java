@@ -12,15 +12,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CompoundButton;
 import android.widget.GridView;
-import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 /**
- * A placeholder fragment containing a simple view.
+ * MainActivityFragment, the main fragment that opens in master in tablet and in the main activity in phone.
  */
 public class MainActivityFragment extends Fragment implements UpdatableFragment {
     ApiRequester requester;
@@ -47,7 +45,8 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_main, container, false); //draws into root or creates it
+        View root = inflater.inflate(R.layout.fragment_main, container, false); //inflates the fragment using the fragment_main.xml layout
+
         gridview = (GridView) root.findViewById(R.id.gridview);
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -62,6 +61,7 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
                 String plot = movie.plot;
                 String posterUri=movie.posterUri;
                 String idTxt=movie.id;
+                //if it's not a tablet then open a new activity and pass the data
                 if(!getResources().getBoolean(R.bool.isTablet)) {
                     Intent intent = new Intent(getActivity(), MovieDetailsActivity.class);
                     intent.putExtra("title", title);
@@ -72,6 +72,7 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
                     intent.putExtra("id", idTxt);
                     startActivity(intent);
                 }
+                // otherwise send the data to parent activity and it will update the fragment
                 else{
                    movieClickListener parentActivity= (movieClickListener)getActivity();
                     parentActivity.updateMovieDetailsView(title,releaseDate,plot,voteAvg,idTxt,posterUri);
@@ -82,6 +83,7 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
         tinydb= new TinyDB(getActivity());
         requester = new ApiRequester(getActivity(),MainActivityFragment.this);
 
+        //set the favorite movies to our favMovies arraylist for quick access , if it doesn't exist yet then create it's entry.
         try {
             favMovies = tinydb.getListMovie("favoriteMovies", Movie.class);
         }
@@ -89,25 +91,8 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
             favMovies=new ArrayList<Movie>();
             tinydb.putListMovie("favoriteMovies",favMovies);
         }
-//        final Switch switcher = (Switch) root.findViewById(R.id.switch1);
-//        switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                // do something, the isChecked will be
-//                if(isChecked){
-//                    switcher.setText("Top Rated");
-//                    requester.getTopRated();
-//
-//                }
-//                else {
-//                    switcher.setText("Most Popular");
-//                    requester.getPopular();
-//
-//
-//
-//                }
-//                // true if the switch is in the On position
-//            }
-//        });
+
+        //To load the active state of the user
         if(savedInstanceState !=null){
             activeState=savedInstanceState.getInt("activeState");
             Log.i("active view", "onCreateView: "+ activeState);
@@ -123,14 +108,14 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
 
     }
 
-
+// The method that updates the contents of the grid in this fragment
     public void updateMasterView(ArrayList<Movie> moviesArray) {
         movies=moviesArray;
         gridview.setAdapter(new ImageAdapter(getActivity(),moviesArray));
 
 
     }
-
+//the updateDetailTrailer and updateDetailReview are for the DetailFragment ;however, here(in this fragment) they have no purpose because they implement the same interface so I had to add these two.
     @Override
     public void updateDetailTrailer(ArrayList<Trailer> trailerArray) {
 
@@ -141,9 +126,9 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
 
     }
 
+    //Display the favorites and set the active state to favorites if the favorites do exist (user previously saved favorites)
     public void displayFavorites(){
         if(favMovies.size()>0) {
-//            favMovies=tinydb.getListMovie("favoriteMovies",Movie.class); //update our current favorite array
             activeState=2;
             updateMasterView(favMovies);
         }
@@ -163,10 +148,10 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
             case R.id.action_top:{activeState=1;requester.getTopRated();}break;
             case R.id.action_popular:{activeState=0;requester.getPopular();}break;
         }
-//        Log.i("active view", "onCreateViewMenu: "+ activeState);
         return super.onOptionsItemSelected(item);
     }
 
+    // just save the current state
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);

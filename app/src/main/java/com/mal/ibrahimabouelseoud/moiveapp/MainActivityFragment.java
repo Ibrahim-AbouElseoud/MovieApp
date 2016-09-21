@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +29,8 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
     static ArrayList<Movie> favMovies;//use to see if in favorites or not
     TinyDB tinydb;
 
+     int activeState;//0 means in popular , 1 means in top rated , 2 means in favorites
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +48,6 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false); //draws into root or creates it
-
         gridview = (GridView) root.findViewById(R.id.gridview);
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -79,7 +81,7 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
 
         tinydb= new TinyDB(getActivity());
         requester = new ApiRequester(getActivity(),MainActivityFragment.this);
-        requester.getPopular();
+
         try {
             favMovies = tinydb.getListMovie("favoriteMovies", Movie.class);
         }
@@ -106,6 +108,16 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
 //                // true if the switch is in the On position
 //            }
 //        });
+        if(savedInstanceState !=null){
+            activeState=savedInstanceState.getInt("activeState");
+            Log.i("active view", "onCreateView: "+ activeState);
+            switch(activeState){
+                case 2: displayFavorites();break;
+                case 1:requester.getTopRated();break;
+                case 0:requester.getPopular();break;
+            }
+        }
+        else requester.getPopular();
 
         return root;
 
@@ -132,6 +144,7 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
     public void displayFavorites(){
         if(favMovies.size()>0) {
 //            favMovies=tinydb.getListMovie("favoriteMovies",Movie.class); //update our current favorite array
+            activeState=2;
             updateMasterView(favMovies);
         }
         else Toast.makeText(getActivity(), "No favorites saved in app yet!", Toast.LENGTH_LONG).show();
@@ -146,11 +159,17 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
             return true;
         }
         switch (id){
-            case R.id.action_favorites: displayFavorites();break;
-            case R.id.action_top:requester.getTopRated();break;
-            case R.id.action_popular:requester.getPopular();break;
+            case R.id.action_favorites:{ displayFavorites();  }break;
+            case R.id.action_top:{activeState=1;requester.getTopRated();}break;
+            case R.id.action_popular:{activeState=0;requester.getPopular();}break;
         }
+//        Log.i("active view", "onCreateViewMenu: "+ activeState);
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("activeState",activeState);
+    }
 }

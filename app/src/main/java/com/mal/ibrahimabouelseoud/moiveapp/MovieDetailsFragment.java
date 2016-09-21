@@ -1,8 +1,8 @@
 package com.mal.ibrahimabouelseoud.moiveapp;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,12 +29,22 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
     TextView vote;
     TextView overView;
     ImageView imageBox;
+    View lineBreak;
 //    RatingBar ratingBar;
     Button favBtn;
     TinyDB tinydb;
     ListView trailerListView;
     ListView reviewListView;
     ApiRequester requester;
+    /// data
+    String titleText;
+    String releaseDateText;
+    String plotText;
+    double voteVal;
+    String movieId;
+    String posterUri;
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,12 +57,14 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
          imageBox =  (ImageView) rootView.findViewById(R.id.imageViewPicture);
 //        ratingBar= (RatingBar) rootView.findViewById(R.id.ratingBar);
         favBtn=(Button) rootView.findViewById(R.id.favoriteButton);
-        tinydb = new TinyDB(getContext());
+        lineBreak=(View) rootView.findViewById(R.id.SplitLine_hor1);
+        tinydb = new TinyDB(getActivity());
 
         trailerListView =(ListView) rootView.findViewById(R.id.trailerListView);
         reviewListView =(ListView) rootView.findViewById(R.id.reviewListView);
 
-        requester=new ApiRequester(getContext(),MovieDetailsFragment.this);
+
+        requester=new ApiRequester(getActivity(),MovieDetailsFragment.this);
 
         return rootView;
 
@@ -62,24 +74,19 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Intent i = getActivity().getIntent();
-       final String titleText= i.getStringExtra("title");
-        title.setText(titleText);
-        final String releaseDateText= i.getStringExtra("releaseDate");
-        releaseDate.setText("Released on "+releaseDateText);
-        final String plotText= i.getStringExtra("plot");
-        overView.setText(plotText);
-        final double voteVal=i.getDoubleExtra("vote",0.0);
-        vote.setText("Vote Average "+voteVal);
+        if(getResources().getBoolean(R.bool.isTablet)){
 
-        final String movieId= i.getStringExtra("id");
-        requester.getTrailers(movieId);
-        requester.getReviews(movieId);
-//        ratingBar.setRating((float)voteVal);
-//        ratingBar.setIsIndicator(true);
+            title.setText("Please click on a poster from the left to get it's Details here");
+            releaseDate.setText("");
+             vote.setText("");
+             overView.setText("");
+            lineBreak.setVisibility(View.INVISIBLE);
+            imageBox.setVisibility(View.INVISIBLE);
+        }
+        else{
+            updateDetailsView();
+        }
 
-        final String posterUri= i.getStringExtra("posterUri");
-        Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185"+posterUri).into(imageBox);
 
         final int index=isInFavoritesIndex(titleText);
         if(index!=-1){
@@ -90,7 +97,7 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
                     ArrayList<Movie> favMovies = MainActivityFragment.favMovies;
                     favMovies.remove(index);
                     tinydb.putListMovie("favoriteMovies",favMovies);
-                    Toast.makeText(getContext(), "removed " + titleText+ " from favorites!",
+                    Toast.makeText(getActivity(), "removed " + titleText+ " from favorites!",
                             Toast.LENGTH_SHORT).show();
                     favBtn.setVisibility(View.INVISIBLE);
                 }
@@ -107,7 +114,7 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
                 Movie favMovie=new Movie(titleText,releaseDateText, voteVal,plotText,posterUri,movieId);
                 favMovies.add(favMovie);
                 tinydb.putListMovie("favoriteMovies",favMovies);
-                Toast.makeText(getContext(), "added " + titleText+ " to favorites!",
+                Toast.makeText(getActivity(), "added " + titleText+ " to favorites!",
                         Toast.LENGTH_SHORT).show();
                 favBtn.setVisibility(View.INVISIBLE);
             }
@@ -123,12 +130,12 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
 
     @Override
     public void updateDetailTrailer(ArrayList<Trailer> trailerArray) {
-        trailerListView.setAdapter(new TrailerAdapter(getContext(),trailerArray));
+        trailerListView.setAdapter(new TrailerAdapter(getActivity(),trailerArray));
     }
 
     @Override
     public void updateDetailReview(ArrayList<Review> reviewArray) {
-        reviewListView.setAdapter(new ReviewAdapter(getContext(),reviewArray));
+        reviewListView.setAdapter(new ReviewAdapter(getActivity(),reviewArray));
     }
     public int isInFavoritesIndex(String title){
         ArrayList<Movie> favMovies = MainActivityFragment.favMovies;
@@ -138,6 +145,49 @@ public class MovieDetailsFragment extends Fragment implements UpdatableFragment{
             }
         }
         return -1; //meaning not found
+    }
+    public void updateDetailsView(){
+        Intent i = getActivity().getIntent();
+        titleText= i.getStringExtra("title");
+        title.setText(titleText);
+        releaseDateText= i.getStringExtra("releaseDate");
+        releaseDate.setText("Released on "+releaseDateText);
+        plotText= i.getStringExtra("plot");
+        overView.setText(plotText);
+        voteVal=i.getDoubleExtra("vote",0.0);
+        vote.setText("Vote Average "+voteVal);
+
+        movieId= i.getStringExtra("id");
+        requester.getTrailers(movieId);
+        requester.getReviews(movieId);
+//        ratingBar.setRating((float)voteVal);
+//        ratingBar.setIsIndicator(true);
+
+        posterUri= i.getStringExtra("posterUri");
+        Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185"+posterUri).into(imageBox);
+    }
+    public void updateDetailsView(String titleText,String releaseDateText,String plotText,double voteVal,String movieId,String posterUri){
+        this.titleText=titleText;
+        title.setText(titleText);
+        this.releaseDateText= releaseDateText;
+        releaseDate.setText("Released on "+releaseDateText);
+        this.plotText=plotText;
+        overView.setText(plotText);
+        this.voteVal=voteVal;
+        vote.setText("Vote Average "+voteVal);
+        if(lineBreak.getVisibility()==View.INVISIBLE ){
+            lineBreak.setVisibility(View.VISIBLE);
+            imageBox.setVisibility(View.VISIBLE);
+        }
+
+        this.movieId= movieId;
+        requester.getTrailers(movieId);
+        requester.getReviews(movieId);
+//        ratingBar.setRating((float)voteVal);
+//        ratingBar.setIsIndicator(true);
+
+        this.posterUri= posterUri;
+        Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w185"+posterUri).into(imageBox);
     }
 
 }

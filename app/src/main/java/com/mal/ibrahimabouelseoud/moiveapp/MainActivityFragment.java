@@ -1,8 +1,8 @@
 package com.mal.ibrahimabouelseoud.moiveapp;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,9 +50,9 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                Toast.makeText(getContext(), "" + movies.get(position).title,
+                Toast.makeText(getActivity(), "" + movies.get(position).title,
                         Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(getContext(), MovieDetailsActivity.class);
+
                 Movie movie=movies.get(position);
                 String title = movie.title;
                 String releaseDate = movie.releaseDate;
@@ -60,20 +60,25 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
                 String plot = movie.plot;
                 String posterUri=movie.posterUri;
                 String idTxt=movie.id;
-                intent.putExtra("title",title);
-                intent.putExtra("releaseDate",releaseDate);
-                intent.putExtra("vote",voteAvg);
-                intent.putExtra("plot",plot);
-                intent.putExtra("posterUri",posterUri);
-                intent.putExtra("id",idTxt);
-
-
-                startActivity(intent);
+                if(!getResources().getBoolean(R.bool.isTablet)) {
+                    Intent intent = new Intent(getActivity(), MovieDetailsActivity.class);
+                    intent.putExtra("title", title);
+                    intent.putExtra("releaseDate", releaseDate);
+                    intent.putExtra("vote", voteAvg);
+                    intent.putExtra("plot", plot);
+                    intent.putExtra("posterUri", posterUri);
+                    intent.putExtra("id", idTxt);
+                    startActivity(intent);
+                }
+                else{
+                   movieClickListener parentActivity= (movieClickListener)getActivity();
+                    parentActivity.updateMovieDetailsView(title,releaseDate,plot,voteAvg,idTxt,posterUri);
+                }
             }
         });
 
-        tinydb= new TinyDB(getContext());
-        requester = new ApiRequester(getContext(),MainActivityFragment.this);
+        tinydb= new TinyDB(getActivity());
+        requester = new ApiRequester(getActivity(),MainActivityFragment.this);
         requester.getPopular();
         try {
             favMovies = tinydb.getListMovie("favoriteMovies", Movie.class);
@@ -109,7 +114,7 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
 
     public void updateMasterView(ArrayList<Movie> moviesArray) {
         movies=moviesArray;
-        gridview.setAdapter(new ImageAdapter(getContext(),moviesArray));
+        gridview.setAdapter(new ImageAdapter(getActivity(),moviesArray));
 
 
     }
@@ -129,7 +134,7 @@ public class MainActivityFragment extends Fragment implements UpdatableFragment 
 //            favMovies=tinydb.getListMovie("favoriteMovies",Movie.class); //update our current favorite array
             updateMasterView(favMovies);
         }
-        else Toast.makeText(getContext(), "No favorites saved in app yet!", Toast.LENGTH_LONG).show();
+        else Toast.makeText(getActivity(), "No favorites saved in app yet!", Toast.LENGTH_LONG).show();
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

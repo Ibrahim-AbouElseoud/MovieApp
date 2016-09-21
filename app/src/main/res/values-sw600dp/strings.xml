@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MoiveApp</string>
     <string name="action_top">Sort by Top Rated</string>
@@ -5,7 +6,5 @@
     <string name="action_favorites">My Favorites</string>
     <string name="title_activity_movie_details">MovieDetails</string>
     <string name="action_settings">Settings</string>
-    <bool name="isTablet">false</bool>
-
-
+    <bool name="isTablet">true</bool>
 </resources>

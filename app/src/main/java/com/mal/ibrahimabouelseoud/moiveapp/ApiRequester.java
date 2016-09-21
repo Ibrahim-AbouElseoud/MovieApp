@@ -2,6 +2,7 @@ package com.mal.ibrahimabouelseoud.moiveapp;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -99,6 +100,8 @@ public class ApiRequester { //update UI here
 //                mTextView.setText("That didn't work!");
                 Log.i("errorrrr", "onErrorResponse: ");
                 error.printStackTrace();
+                Toast.makeText(context, "Network error , please check your network !",
+                        Toast.LENGTH_LONG).show();
             }
         });
 // Add the request to the RequestQueue.
@@ -140,6 +143,8 @@ public class ApiRequester { //update UI here
             public void onErrorResponse(VolleyError error) {
 //                mTextView.setText("That didn't work!");
                 error.printStackTrace();
+                Toast.makeText(context, "Network error , please check your network !",
+                        Toast.LENGTH_LONG).show();
             }
 
         });
@@ -175,6 +180,8 @@ public class ApiRequester { //update UI here
 //                mTextView.setText("That didn't work!");
                 Log.i("errorrrr", "onErrorResponse: ");
                 error.printStackTrace();
+                Toast.makeText(context, "Network error while getting reviews , please check your network !",
+                        Toast.LENGTH_LONG).show();
             }
         });
 // Add the request to the RequestQueue.
@@ -212,6 +219,8 @@ public class ApiRequester { //update UI here
 //                mTextView.setText("That didn't work!");
                 Log.i("errorrrr", "onErrorResponse: ");
                 error.printStackTrace();
+                Toast.makeText(context, "Network error while getting trailer , please check your network !",
+                        Toast.LENGTH_LONG).show();
             }
         });
 // Add the request to the RequestQueue.
